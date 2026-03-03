@@ -1,0 +1,92 @@
+# ============================================================
+#  EMAIL AI PIPELINE — Docker Compose
+#  Runs: n8n + LangGraph Agent Service
+#  Ollama runs natively on Windows (outside Docker) for GPU access
+#
+#  Usage:
+#    Start:   docker-compose up -d
+#    Stop:    docker-compose down
+#    Logs:    docker-compose logs -f n8n
+#    Rebuild: docker-compose up -d --build
+# ============================================================
+
+version: "3.8"
+
+services:
+
+  # ----------------------------------------------------------
+  #  n8n — Workflow Orchestrator
+  # ----------------------------------------------------------
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Core
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=${N8N_PORT:-5678}
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/Chicago}
+
+      # Security
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+
+      # AI integrations
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+
+      # Agent service
+      - AGENT_SERVICE_URL=${AGENT_SERVICE_URL:-http://agent-service:8000}
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows  # local workflow backups (read-only reference)
+
+    # host.docker.internal lets n8n reach Ollama running natively on Windows
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - pipeline-net
+
+  # ----------------------------------------------------------
+  #  LangGraph Agent Service — AI Processing Microservice
+  #  (Dockerfile lives in agents/email_processor/)
+  # ----------------------------------------------------------
+  agent-service:
+    build:
+      context: ./agents/email_processor
+      dockerfile: Dockerfile
+    container_name: agent-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL_FAST=${OLLAMA_MODEL_FAST:-phi4-mini}
+      - OLLAMA_MODEL_SMART=${OLLAMA_MODEL_SMART:-llama3.1}
+      - AGENT_SERVICE_API_KEY=${AGENT_SERVICE_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - pipeline-net
+
+    # Don't fail startup if agent service isn't built yet
+    profiles:
+      - with-agents
+
+# ----------------------------------------------------------
+#  Volumes & Networks
+# ----------------------------------------------------------
+volumes:
+  n8n_data:
+    driver: local
+
+networks:
+  pipeline-net:
+    driver: bridge

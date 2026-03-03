@@ -1,0 +1,59 @@
+# ============================================================
+#  EMAIL AI PIPELINE — .gitignore
+# ============================================================
+
+# --- Secrets (NEVER commit these) ---------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+token.json
+
+# --- n8n local data (machine-specific, too large) -----------
+n8n_data/
+.n8n/
+
+# --- Python -------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+ENV/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# --- Node / JS ----------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Docker -------------------------------------------------
+# (docker-compose.yml IS committed, but not local override)
+docker-compose.override.yml
+
+# --- OS -----------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- IDE ----------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Logs ---------------------------------------------------
+logs/
+*.log
