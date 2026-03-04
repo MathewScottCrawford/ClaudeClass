@@ -1,0 +1,95 @@
+{
+  "name": "Hello World",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "065d6d9a-9b28-45fd-bb93-e67f3bf31737",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ac4c054-fdd0-4c0e-b0c1-f9fec922c573",
+              "name": "message",
+              "value": "=Hello from {{ $now.format('cccc') }} n8n!",
+              "type": "string"
+            },
+            {
+              "id": "9cca99ab-8427-4f11-83fe-2628fff0b7c3",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3a4c3e7b-e033-4565-ae22-5d07f1eb4c8c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 'items' is the array of items flowing through\n// Each item has a 'json' property with your data\nfor (const item of items) {\n  item.json.excited = item.json.message + \" 🎉\";\n  item.json.processed = true;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "13615204-9baf-428f-8f0f-f7183ea042b9",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3c306a27-d8ee-47da-a790-bd9f37b28dc8",
+  "meta": {
+    "instanceId": "ccadacc066e5bff871641d85f611fa8247e3be9f8389d8f0d1634c6d9fef7694"
+  },
+  "id": "kkGYqbmcKahqCG8Z",
+  "tags": []
+}
