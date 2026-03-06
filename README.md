@@ -47,8 +47,8 @@ See [`docs/architecture.md`](docs/architecture.md) for full detail.
 
 ### 1. Clone & configure
 ```powershell
-git clone https://github.com/YOUR_USERNAME/email-ai-pipeline.git
-cd email-ai-pipeline
+git clone https://github.com/MathewScottCrawford/ClaudeClass.git
+cd ClaudeClass
 cp .env.example .env
 # Edit .env with your values
 ```
@@ -76,7 +76,7 @@ In n8n UI: **Workflows → Import** → select files from `n8n/workflows/`
 ## 📁 Project Structure
 
 ```
-email-ai-pipeline/
+ClaudeClass/
 ├── .env.example              ← copy to .env, fill in values
 ├── .gitignore
 ├── README.md

@@ -10,7 +10,7 @@
 #    Rebuild: docker-compose up -d --build
 # ============================================================
 
-version: "3.8"
+# version: "3.8"
 
 services:
 
@@ -29,7 +29,7 @@ services:
       - N8N_PORT=${N8N_PORT:-5678}
       - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
       - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
-      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/Chicago}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/Detroit}
 
       # Security
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
