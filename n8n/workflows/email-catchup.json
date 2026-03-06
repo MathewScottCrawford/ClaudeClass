@@ -1,0 +1,99 @@
+{
+  "name": "email-catchup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f26cd634-4ab3-46e3-b5af-1fd956734603",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "filters": {
+          "readStatus": "both"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "110e4596-d55d-44b3-9678-b11a2b67bd27",
+      "name": "Get many messages",
+      "webhookId": "9ed18c56-7af4-499c-a5a2-52d5f6b8f9cd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TGI9tkxrOLW4HssB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items_out = [];\n\nfor (const item of items) {\n  const msg = item.json;\n  \n  // Extract label names as a flat array\n  const labelNames = (msg.labels || []).map(l => l.name);\n  \n  // Build clean normalized object\n  items_out.push({\n    json: {\n      message_id:   msg.id,\n      thread_id:    msg.threadId,\n      subject:      msg.Subject || msg.subject || '(no subject)',\n      from:         msg.From || msg.from || '',\n      to:           msg.To || msg.to || '',\n      snippet:      msg.snippet || '',\n      date:         msg.internalDate \n                      ? new Date(parseInt(msg.internalDate)).toISOString()\n                      : '',\n      labels:       labelNames,\n      is_unread:    labelNames.includes('UNREAD'),\n      is_inbox:     labelNames.includes('INBOX'),\n      account:      'gmail',\n      // body will be added in next iteration\n      // keeping this field present for schema consistency\n      body:         msg.body || msg.snippet || '',\n    }\n  });\n}\n\nreturn items_out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "58836077-3200-45e6-ae20-5def61c00a67",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "408bd747-cbea-4890-87a9-44a112676d77",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ccadacc066e5bff871641d85f611fa8247e3be9f8389d8f0d1634c6d9fef7694"
+  },
+  "id": "y5zV6kpQ2lbO8dwG",
+  "tags": []
+}
